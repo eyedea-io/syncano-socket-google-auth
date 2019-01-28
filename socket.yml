@@ -1,0 +1,16 @@
+name: google-auth
+description: google oauth
+keywords:
+  - google auth
+  - oauth
+
+endpoints:
+  verify:
+    description: verify
+  grant:
+    description: grant
+
+config:
+  GRANT_SECRET:
+    description: Google App Secret
+    required: true

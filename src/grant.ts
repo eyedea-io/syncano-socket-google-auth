@@ -12,44 +12,41 @@ class Endpoint extends S.Endpoint {
     {response}: S.Core,
     {args, config}: S.Context<Args>
   ) {
+    const state = JSON.parse(args.state)
+    const {code} = args
+    const serialize = obj => {
+      const str = []
 
-  const state = JSON.parse(args.state)
-  const {code} = args
-  const serialize = obj => {
-    const str = []
-
-    for (const p in obj) {
-      if (obj.hasOwnProperty(p)) {
-        str.push(`${encodeURIComponent(p)}=${encodeURIComponent(obj[p])}`)
+      for (const p in obj) {
+        if (obj.hasOwnProperty(p)) {
+          str.push(`${encodeURIComponent(p)}=${encodeURIComponent(obj[p])}`)
+        }
       }
+
+      return str.join('&')
     }
 
-    return str.join('&')
-  }
+    try {
+      const clientSecret = config.GRANT_SECRET
+      const result = await axios.post(
+        state.oauth.grant,
+        serialize({
+          code,
+          client_id: state.client_id,
+          redirect_uri: state.redirect_uri,
+          grant_type: 'authorization_code',
+          client_secret: clientSecret,
+        })
+      )
+      const responseData = result.data
+      responseData.state = JSON.stringify(state)
 
-  try {
-    const clientSecret = config.GRANT_SECRET
-    const result = await axios(state.oauth.grant, {
-      method: 'POST',
-      data: serialize({
-        code,
-        client_id: state.client_id,
-        redirect_uri: state.redirect_uri,
-        grant_type: 'authorization_code',
-        client_secret: clientSecret,
-      }),
-    })
-
-    const responseData = result.data
-    responseData.state = JSON.stringify(state)
-
-    response('', 302, '', {
-      Location: `${state.redirect_uri}/?${querystring.stringify(responseData)}`,
-    })
-  } catch (err) {
-    throw new Error(err)
+      response('', 302, '', {
+        Location: `${state.redirect_uri}/?${querystring.stringify(responseData)}`,
+      })
+    } catch (err) {
+      throw new Error(err)
     }
-
   }
 }
 

@@ -32,10 +32,11 @@ class Endpoint extends S.Endpoint {
 
       return response.json(user, 200)
     } catch (err) {
+      console.warn(err)
+
       return response.json({message: 'An error occured!'}, 400)
     }
   }
-
 }
 
 export default ctx => new Endpoint(ctx)

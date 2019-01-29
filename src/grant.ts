@@ -43,7 +43,7 @@ class Endpoint extends S.Endpoint {
     const responseData = result.data
     responseData.state = JSON.stringify(state)
 
-    return response('', 302, '', {
+    response('', 302, '', {
       Location: `${state.redirect_uri}/?${querystring.stringify(responseData)}`,
     })
   } catch (err) {

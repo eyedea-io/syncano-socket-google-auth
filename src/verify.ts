@@ -30,7 +30,7 @@ class Endpoint extends S.Endpoint {
           fullName: data.name,
         })
 
-      return response.json({}, 200)
+      return response.json(user, 200)
     } catch (err) {
       return response.json({message: 'An error occured!'}, 400)
     }
